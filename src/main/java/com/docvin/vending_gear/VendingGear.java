@@ -12,11 +12,14 @@ import com.docvin.vending_gear.capabilities.potion.PotionsDrank;
 import com.docvin.vending_gear.capabilities.potion.PotionsDrankStorage;
 import com.docvin.vending_gear.events.VendingGearEvents;
 import com.docvin.vending_gear.packets.server.DrankEnoughPotionPacket;
+import com.docvin.vending_gear.registar.VendingGearEntities;
+import com.docvin.vending_gear.registar.VendingGearRenders;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,8 +34,14 @@ public class VendingGear {
 	public static ConfigEventHandler configHandler;
 	public static VendingGearConfigs config;
 
+	@Instance(VendingGear.MODID)
+	public static VendingGear instance = new VendingGear();
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+
+		VendingGearEntities.init();
+		VendingGearRenders.init();
 
 		event.getModMetadata().version = VERSION;
 		config = new VendingGearConfigs();
