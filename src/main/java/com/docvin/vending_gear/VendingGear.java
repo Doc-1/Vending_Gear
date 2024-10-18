@@ -10,13 +10,16 @@ import com.docvin.vending_gear.capabilities.CapabilityHandler;
 import com.docvin.vending_gear.capabilities.potion.IPotionsDrank;
 import com.docvin.vending_gear.capabilities.potion.PotionsDrank;
 import com.docvin.vending_gear.capabilities.potion.PotionsDrankStorage;
+import com.docvin.vending_gear.entities.vending_machine.VendingGearTankEntity;
+import com.docvin.vending_gear.entities.vending_machine.VendingGearTankRender;
 import com.docvin.vending_gear.events.VendingGearEvents;
 import com.docvin.vending_gear.packets.server.DrankEnoughPotionPacket;
+import com.docvin.vending_gear.packets.server.SparkPacket;
 import com.docvin.vending_gear.registar.VendingGearEntities;
-import com.docvin.vending_gear.registar.VendingGearRenders;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -41,7 +44,7 @@ public class VendingGear {
 	public void preInit(FMLPreInitializationEvent event) {
 
 		VendingGearEntities.init();
-		VendingGearRenders.init();
+		RenderingRegistry.registerEntityRenderingHandler(VendingGearTankEntity.class, VendingGearTankRender::new);
 
 		event.getModMetadata().version = VERSION;
 		config = new VendingGearConfigs();
@@ -60,6 +63,8 @@ public class VendingGear {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		CreativeCorePacket.registerPacket(DrankEnoughPotionPacket.class);
+		CreativeCorePacket.registerPacket(SparkPacket.class);
+
 		// logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
 	}
 }
