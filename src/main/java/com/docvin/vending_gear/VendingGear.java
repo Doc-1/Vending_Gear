@@ -16,6 +16,8 @@ import com.docvin.vending_gear.events.VendingGearEvents;
 import com.docvin.vending_gear.packets.server.DrankEnoughPotionPacket;
 import com.docvin.vending_gear.packets.server.JetBoostPacket;
 import com.docvin.vending_gear.packets.server.SparkPacket;
+import com.docvin.vending_gear.packets.server.StartAttackAnimationPacket;
+import com.docvin.vending_gear.packets.server.StartJumpAnimationPacket;
 import com.docvin.vending_gear.registar.VendingGearEntities;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -70,6 +72,8 @@ public class VendingGear {
 		CreativeCorePacket.registerPacket(DrankEnoughPotionPacket.class);
 		CreativeCorePacket.registerPacket(SparkPacket.class);
 		CreativeCorePacket.registerPacket(JetBoostPacket.class);
+		CreativeCorePacket.registerPacket(StartJumpAnimationPacket.class);
+		CreativeCorePacket.registerPacket(StartAttackAnimationPacket.class);
 
 		// logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
 	}

@@ -7,6 +7,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.creativemd.creativecore.common.packet.PacketHandler;
 import com.docvin.vending_gear.packets.server.JetBoostPacket;
 import com.docvin.vending_gear.packets.server.SparkPacket;
+import com.docvin.vending_gear.packets.server.StartAttackAnimationPacket;
+import com.docvin.vending_gear.packets.server.StartJumpAnimationPacket;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
@@ -49,20 +51,32 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 	private int fuseTime = 30;
 	private int timeSinceIgnited = 0;
 
+	public boolean startJumpAnim = false;
+	public boolean startAttackAnim = false;
+
 	public boolean startAnimation = false;
 	private int timeSinceFalling = 0;
 	private int fallingTime = 120;
 	private Vec3d originPos = null;
 	private int distance = 20;
 
-	protected static final AnimationBuilder HOVER_ANIM = new AnimationBuilder().addAnimation("animation.model.hover",
-			ILoopType.EDefaultLoopTypes.HOLD_ON_LAST_FRAME);
+	protected static final AnimationBuilder JUMP_ANIM = new AnimationBuilder().addAnimation("animation.model.jump",
+			ILoopType.EDefaultLoopTypes.PLAY_ONCE);
 	protected static final AnimationBuilder ATTACK_ANIM = new AnimationBuilder().addAnimation("animation.model.attack",
 			ILoopType.EDefaultLoopTypes.PLAY_ONCE);
 
 	private final AnimationFactory FACTORY = new AnimationFactory(this);
 
 	private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+		event.getController().clearAnimationCache();
+		if (this.startJumpAnim) {
+			event.getController().setAnimation(JUMP_ANIM);
+			this.startJumpAnim = false;
+		}
+		if (this.startAttackAnim) {
+			event.getController().setAnimation(ATTACK_ANIM);
+			this.startAttackAnim = false;
+		}
 		return PlayState.CONTINUE;
 	}
 
@@ -101,6 +115,10 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 
 	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase target, float distanceFactor) {
+		for (EntityPlayer entityplayer : this.world.playerEntities)
+			if (entityplayer.getDistanceSq(this) < 4096.0D)
+				PacketHandler.sendPacketToPlayer(new StartAttackAnimationPacket(this.getEntityId()),
+						(EntityPlayerMP) entityplayer);
 		double d0 = target.posY + (double) target.getEyeHeight();
 		double d1 = target.posX + target.motionX - this.posX;
 		double d2 = d0 - this.posY;
@@ -167,11 +185,26 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 	}
 
 	@Override
+	protected float getJumpUpwardsMotion() {
+		return 0.6F;
+	}
+
+	@Override
+	protected void jump() {
+		super.jump();
+		for (EntityPlayer entityplayer : this.world.playerEntities)
+			if (entityplayer.getDistanceSq(this) < 4096.0D)
+				PacketHandler.sendPacketToPlayer(new StartJumpAnimationPacket(this.getEntityId()),
+						(EntityPlayerMP) entityplayer);
+	}
+
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		this.motionY = Math.max(this.motionY, -3);
 		if (!this.world.isRemote) {
 			if (this.isEntityAlive()) {
+
 				this.timeSinceIgnited += this.isInWater() ? 1 : -1;
 
 				if (this.timeSinceIgnited > 0 && this.timeSinceIgnited % 2 == 0)
@@ -269,12 +302,6 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	protected void jump() {
-		super.jump();
-
 	}
 
 	/**
