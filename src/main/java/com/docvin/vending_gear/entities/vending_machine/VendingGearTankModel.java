@@ -31,9 +31,14 @@ public class VendingGearTankModel extends CustomAnimatedGeoModel<VendingGearTank
 	@Override
 	public void setCustomAnimations(VendingGearTankEntity animatable, long instanceId,
 			@Nullable AnimationEvent animationEvent) {
+
 		GeoBone bone = (GeoBone) getAnimationProcessor().getBone("left_track");
-		if (bone != null && animatable.isFalling()) {
-			bone.setRotationX(45F);
+		if (bone != null && animatable.isFalling) {
+			bone.setRotationX((float) Math.toRadians(12));
+		}
+		GeoBone bone2 = (GeoBone) getAnimationProcessor().getBone("right_track");
+		if (bone2 != null && animatable.isFalling) {
+			bone2.setRotationX((float) Math.toRadians(12));
 		}
 	}
 }

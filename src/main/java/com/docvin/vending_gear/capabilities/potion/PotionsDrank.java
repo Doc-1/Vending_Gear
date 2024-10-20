@@ -24,7 +24,6 @@ public class PotionsDrank implements IPotionsDrank {
 	@Override
 	public boolean hasDrankEnough() {
 		if (this.totalDrank() >= drinksNeeded) {
-			this.reset();
 			return true;
 		}
 		return false;

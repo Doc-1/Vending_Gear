@@ -1,13 +1,13 @@
 package com.docvin.vending_gear.events;
 
-import com.creativemd.creativecore.common.packet.PacketHandler;
 import com.docvin.vending_gear.capabilities.potion.IPotionsDrank;
 import com.docvin.vending_gear.capabilities.potion.PotionsDrankProvider;
-import com.docvin.vending_gear.packets.server.DrankEnoughPotionPacket;
+import com.docvin.vending_gear.entities.vending_machine.VendingGearTankEntity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -34,8 +34,15 @@ public class VendingGearEvents {
 			message += String.format(" Something will happen when you drink §7%d§r potions.",
 					(int) potionsDrank.drinksNeeded());
 			player.sendMessage(new TextComponentString(message));
+			System.out.println("hi");
 			if (potionsDrank.hasDrankEnough()) {
-				PacketHandler.sendPacketToPlayer(new DrankEnoughPotionPacket(), player);
+				VendingGearTankEntity entity = new VendingGearTankEntity(player.world);
+				BlockPos pos = new BlockPos(player.posX, 250, player.posZ);
+				entity.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
+				player.world.spawnEntity(entity);
+
+				potionsDrank.reset();
+
 			}
 		}
 	}

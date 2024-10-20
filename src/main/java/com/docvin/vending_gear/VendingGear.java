@@ -14,6 +14,7 @@ import com.docvin.vending_gear.entities.vending_machine.VendingGearTankEntity;
 import com.docvin.vending_gear.entities.vending_machine.VendingGearTankRender;
 import com.docvin.vending_gear.events.VendingGearEvents;
 import com.docvin.vending_gear.packets.server.DrankEnoughPotionPacket;
+import com.docvin.vending_gear.packets.server.JetBoostPacket;
 import com.docvin.vending_gear.packets.server.SparkPacket;
 import com.docvin.vending_gear.registar.VendingGearEntities;
 
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import software.bernie.geckolib3.GeckoLib;
 
 @Mod(modid = VendingGear.MODID, name = VendingGear.NAME, version = VendingGear.VERSION)
 public class VendingGear {
@@ -40,9 +42,12 @@ public class VendingGear {
 	@Instance(VendingGear.MODID)
 	public static VendingGear instance = new VendingGear();
 
+	public VendingGear() {
+		GeckoLib.initialize();
+	}
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-
 		VendingGearEntities.init();
 		RenderingRegistry.registerEntityRenderingHandler(VendingGearTankEntity.class, VendingGearTankRender::new);
 
@@ -64,6 +69,7 @@ public class VendingGear {
 	public void init(FMLInitializationEvent event) {
 		CreativeCorePacket.registerPacket(DrankEnoughPotionPacket.class);
 		CreativeCorePacket.registerPacket(SparkPacket.class);
+		CreativeCorePacket.registerPacket(JetBoostPacket.class);
 
 		// logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
 	}
