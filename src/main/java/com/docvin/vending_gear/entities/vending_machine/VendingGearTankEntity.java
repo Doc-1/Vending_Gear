@@ -1,5 +1,9 @@
 package com.docvin.vending_gear.entities.vending_machine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.creativemd.creativecore.common.packet.PacketHandler;
 import com.docvin.vending_gear.packets.server.JetBoostPacket;
 import com.docvin.vending_gear.packets.server.SparkPacket;
@@ -19,11 +23,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
 import net.minecraft.init.PotionTypes;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.math.BlockPos;
@@ -45,7 +49,7 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 	private int fuseTime = 30;
 	private int timeSinceIgnited = 0;
 
-	public boolean isFalling = false;
+	public boolean startAnimation = false;
 	private int timeSinceFalling = 0;
 	private int fallingTime = 120;
 	private Vec3d originPos = null;
@@ -66,6 +70,7 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 		super(worldIn);
 		this.setSize(1.6F, 3.4F);
 		this.enablePersistence();
+		this.setPathPriority(PathNodeType.WATER, -1.0F);
 	}
 
 	protected void applyEntityAttributes() {
@@ -96,25 +101,56 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 
 	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase target, float distanceFactor) {
-		double d0 = target.posY + (double) target.getEyeHeight() - 1.100000023841858D;
+		double d0 = target.posY + (double) target.getEyeHeight();
 		double d1 = target.posX + target.motionX - this.posX;
 		double d2 = d0 - this.posY;
 		double d3 = target.posZ + target.motionZ - this.posZ;
 		float f = MathHelper.sqrt(d1 * d1 + d3 * d3);
-		PotionType potiontype = PotionTypes.HARMING;
 
-		if (f >= 8.0F && !target.isPotionActive(MobEffects.SLOWNESS)) {
-			potiontype = PotionTypes.SLOWNESS;
-		} else if (target.getHealth() >= 8.0F && !target.isPotionActive(MobEffects.POISON)) {
-			potiontype = PotionTypes.POISON;
-		} else if (f <= 3.0F && !target.isPotionActive(MobEffects.WEAKNESS) && this.rand.nextFloat() < 0.25F) {
-			potiontype = PotionTypes.WEAKNESS;
-		}
+		List<PotionType> list = new ArrayList<PotionType>();
+		list.add(PotionTypes.AWKWARD);
+		list.add(PotionTypes.FIRE_RESISTANCE);
+		list.add(PotionTypes.HARMING);
+		list.add(PotionTypes.HEALING);
+		list.add(PotionTypes.INVISIBILITY);
+		list.add(PotionTypes.LEAPING);
+		list.add(PotionTypes.LONG_FIRE_RESISTANCE);
+		list.add(PotionTypes.LONG_INVISIBILITY);
+		list.add(PotionTypes.LONG_LEAPING);
+		list.add(PotionTypes.LONG_NIGHT_VISION);
+		list.add(PotionTypes.LONG_POISON);
+		list.add(PotionTypes.LONG_REGENERATION);
+		list.add(PotionTypes.LONG_SLOWNESS);
+		list.add(PotionTypes.LONG_STRENGTH);
+		list.add(PotionTypes.LONG_SWIFTNESS);
+		list.add(PotionTypes.LONG_WATER_BREATHING);
+		list.add(PotionTypes.LONG_WEAKNESS);
+		list.add(PotionTypes.MUNDANE);
+		list.add(PotionTypes.NIGHT_VISION);
+		list.add(PotionTypes.POISON);
+		list.add(PotionTypes.REGENERATION);
+		list.add(PotionTypes.SLOWNESS);
+		list.add(PotionTypes.STRENGTH);
+		list.add(PotionTypes.STRONG_HARMING);
+		list.add(PotionTypes.STRONG_HEALING);
+		list.add(PotionTypes.STRONG_LEAPING);
+		list.add(PotionTypes.STRONG_POISON);
+		list.add(PotionTypes.STRONG_REGENERATION);
+		list.add(PotionTypes.STRONG_STRENGTH);
+		list.add(PotionTypes.STRONG_SWIFTNESS);
+		list.add(PotionTypes.SWIFTNESS);
+		list.add(PotionTypes.THICK);
+		list.add(PotionTypes.WATER);
+		list.add(PotionTypes.WATER_BREATHING);
+		list.add(PotionTypes.WEAKNESS);
+
+		PotionType potiontype = list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
 
 		EntityPotion entitypotion = new EntityPotion(this.world, this,
 				PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), potiontype));
 		entitypotion.rotationPitch -= -20.0F;
-		entitypotion.shoot(d1, d2 + (double) (f * 0.2F), d3, 0.75F, 8.0F);
+		entitypotion.posY -= 1.5;
+		entitypotion.shoot(d1, d2 + (double) (f * 0.2F), d3, 0.75F, 1.0F);
 		this.world.playSound((EntityPlayer) null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_PISTON_EXTEND,
 				this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
 		this.world.spawnEntity(entitypotion);
@@ -134,7 +170,6 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 	public void onUpdate() {
 		super.onUpdate();
 		this.motionY = Math.max(this.motionY, -3);
-		isFalling = isFalling();
 		if (!this.world.isRemote) {
 			if (this.isEntityAlive()) {
 				this.timeSinceIgnited += this.isInWater() ? 1 : -1;
@@ -162,7 +197,6 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 						double value = easeOutBack((double) this.timeSinceFalling / (double) this.fallingTime)
 								* (this.distance - 3);
 						double height = Math.abs(value - this.distance);
-						Vec3d prev = this.getPositionVector();
 						this.setPositionAndUpdate(this.posX, this.originPos.y - this.distance + height, this.posZ);
 						this.motionY = 0;
 						for (EntityPlayer entityplayer : this.world.playerEntities)
@@ -179,6 +213,13 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 		}
 	}
 
+	/**
+	 * Cubic-Brezier Easing function to smooth out the landing. Thank you N247S for
+	 * the help teaching me easing functions!
+	 * 
+	 * @param x Normalized value how far in the animation it is in.
+	 * @return
+	 */
 	public double easeOutBack(double x) {
 		double c1 = 1.70158;
 		double c3 = c1 + 1;
@@ -192,6 +233,12 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 
 	}
 
+	/**
+	 * Provides the distance the entity is from the ground
+	 * 
+	 * @param vec This is the entity's position
+	 * @return the distance from the ground the entity is.
+	 */
 	private double distanceToGround(Vec3d vec) {
 		int block;
 		Vec3d pos = this.getPositionVector();
@@ -203,11 +250,15 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 		return vec.y - pos.y;
 	}
 
+	/**
+	 * Checks to see if the entity has met conditions to start break animation.
+	 * 
+	 * @return true if it has no {@link #originPos},
+	 *         {@link net.minecraft.entity.Entity#motionY} is not more than -0.3 and
+	 *         is less than -1.0, and if {@link #distance} is greater than or equal
+	 *         to {@link #distanceToGround(Vec3d)}
+	 */
 	public boolean shouldStartBreak() {
-		// check 20 blocks above
-		// and have speed
-		// set state for isFalling()
-
 		if (this.originPos != null)
 			return true;
 		if (this.motionY > -0.3D)
@@ -220,10 +271,15 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 		return false;
 	}
 
-	public boolean isFalling() {
-		return this.isAirBorne;
+	@Override
+	protected void jump() {
+		super.jump();
+
 	}
 
+	/**
+	 * Disables fall damage.
+	 */
 	@Override
 	public void fall(float distance, float damageMultiplier) {
 	}
@@ -232,8 +288,8 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 	protected void initEntityAI() {
 		this.tasks.addTask(2, new EntityAIAttackRanged(this, 0.3D, 60, 10.0F));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 0.3D));
-		this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-		this.tasks.addTask(7, new EntityAILookIdle(this));
+		this.tasks.addTask(3, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+		this.tasks.addTask(4, new EntityAILookIdle(this));
 		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true));
 	}

@@ -9,6 +9,13 @@ public class VendingGearConfigs {
 	@CreativeConfig(type = ConfigSynchronization.UNIVERSAL)
 	public SpawnConfigs spawnConfigs = new SpawnConfigs();
 
+	@CreativeConfig(type = ConfigSynchronization.SERVER)
+	public TankConfigs tankConfigs = new TankConfigs();
+
+	public class TankConfigs {
+
+	}
+
 	public class SpawnConfigs {
 		@CreativeConfig
 		// Tells if a random number should be used

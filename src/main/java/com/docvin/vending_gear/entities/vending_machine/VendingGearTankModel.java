@@ -33,11 +33,11 @@ public class VendingGearTankModel extends CustomAnimatedGeoModel<VendingGearTank
 			@Nullable AnimationEvent animationEvent) {
 
 		GeoBone bone = (GeoBone) getAnimationProcessor().getBone("left_track");
-		if (bone != null && animatable.isFalling) {
+		if (bone != null && animatable.startAnimation) {
 			bone.setRotationX((float) Math.toRadians(12));
 		}
 		GeoBone bone2 = (GeoBone) getAnimationProcessor().getBone("right_track");
-		if (bone2 != null && animatable.isFalling) {
+		if (bone2 != null && animatable.startAnimation) {
 			bone2.setRotationX((float) Math.toRadians(12));
 		}
 	}
