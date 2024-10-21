@@ -83,7 +83,6 @@ public class VendingGearTankEntity extends EntityMob implements IRangedAttackMob
 	public VendingGearTankEntity(World worldIn) {
 		super(worldIn);
 		this.setSize(1.6F, 3.4F);
-		this.enablePersistence();
 		this.setPathPriority(PathNodeType.WATER, -1.0F);
 	}
 

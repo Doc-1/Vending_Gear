@@ -1,14 +1,24 @@
 package com.docvin.vending_gear.events;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.docvin.vending_gear.capabilities.potion.IPotionsDrank;
 import com.docvin.vending_gear.capabilities.potion.PotionsDrankProvider;
 import com.docvin.vending_gear.entities.vending_machine.VendingGearTankEntity;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -45,6 +55,57 @@ public class VendingGearEvents {
 
 			}
 		}
+	}
+
+	@SubscribeEvent
+	public static void onDeath(LivingDeathEvent event) {
+		Entity entity = event.getEntity();
+		if (entity.world.isRemote)
+			return;
+		if (entity instanceof VendingGearTankEntity) {
+			List<PotionType> list = new ArrayList<PotionType>();
+			list.add(PotionTypes.AWKWARD);
+			list.add(PotionTypes.FIRE_RESISTANCE);
+			list.add(PotionTypes.HARMING);
+			list.add(PotionTypes.HEALING);
+			list.add(PotionTypes.INVISIBILITY);
+			list.add(PotionTypes.LEAPING);
+			list.add(PotionTypes.LONG_FIRE_RESISTANCE);
+			list.add(PotionTypes.LONG_INVISIBILITY);
+			list.add(PotionTypes.LONG_LEAPING);
+			list.add(PotionTypes.LONG_NIGHT_VISION);
+			list.add(PotionTypes.LONG_POISON);
+			list.add(PotionTypes.LONG_REGENERATION);
+			list.add(PotionTypes.LONG_SLOWNESS);
+			list.add(PotionTypes.LONG_STRENGTH);
+			list.add(PotionTypes.LONG_SWIFTNESS);
+			list.add(PotionTypes.LONG_WATER_BREATHING);
+			list.add(PotionTypes.LONG_WEAKNESS);
+			list.add(PotionTypes.MUNDANE);
+			list.add(PotionTypes.NIGHT_VISION);
+			list.add(PotionTypes.POISON);
+			list.add(PotionTypes.REGENERATION);
+			list.add(PotionTypes.SLOWNESS);
+			list.add(PotionTypes.STRENGTH);
+			list.add(PotionTypes.STRONG_HARMING);
+			list.add(PotionTypes.STRONG_HEALING);
+			list.add(PotionTypes.STRONG_LEAPING);
+			list.add(PotionTypes.STRONG_POISON);
+			list.add(PotionTypes.STRONG_REGENERATION);
+			list.add(PotionTypes.STRONG_STRENGTH);
+			list.add(PotionTypes.STRONG_SWIFTNESS);
+			list.add(PotionTypes.SWIFTNESS);
+			list.add(PotionTypes.THICK);
+			list.add(PotionTypes.WATER);
+			list.add(PotionTypes.WATER_BREATHING);
+			list.add(PotionTypes.WEAKNESS);
+			ItemStack potion = new ItemStack(Items.SPLASH_POTION);
+			PotionType potiontype = list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
+
+			PotionUtils.addPotionToItemStack(potion, potiontype);
+			entity.entityDropItem(potion, 1);
+		}
+
 	}
 
 	/**
