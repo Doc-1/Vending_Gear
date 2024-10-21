@@ -16,6 +16,6 @@ public class VendingGearEntities {
 	}
 
 	public static void init() {
-		registerEntity("vending_machine", VendingGearTankEntity.class, 1, 256, 0x999999, 0x111111);
+		registerEntity("vending_gear_tank", VendingGearTankEntity.class, 1, 256, 0x691d1d, 0x1bc61b);
 	}
 }
