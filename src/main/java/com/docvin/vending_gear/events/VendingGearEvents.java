@@ -40,11 +40,6 @@ public class VendingGearEvents {
 			EntityPlayerMP player = (EntityPlayerMP) event.getEntityLiving();
 			IPotionsDrank potionsDrank = player.getCapability(PotionsDrankProvider.POTIONS_DRANK, null);
 			potionsDrank.add();
-			String message = String.format("You have drank §7%d§r potions.", (int) potionsDrank.totalDrank());
-			message += String.format(" Something will happen when you drink §7%d§r potions.",
-					(int) potionsDrank.drinksNeeded());
-			player.sendMessage(new TextComponentString(message));
-			System.out.println("hi");
 			if (potionsDrank.hasDrankEnough()) {
 				VendingGearTankEntity entity = new VendingGearTankEntity(player.world);
 				BlockPos pos = new BlockPos(player.posX, 250, player.posZ);
